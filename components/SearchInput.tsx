@@ -1,40 +1,41 @@
 'use client';
 
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {useEffect, useState} from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import {formUrlQuery, removeKeysFromUrlQuery} from "@jsmastery/utils";
+import { formUrlQuery, removeKeysFromUrlQuery } from "@jsmastery/utils";
 
-export default function SearchInput ()  {
+export default function SearchInput() {
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
-    // const query = searchParams.get('topic') || '';
 
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const paramsString = searchParams.toString();
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            if(searchQuery) {
+        const handler = setTimeout(() => {
+            if (searchQuery) {
                 const newUrl = formUrlQuery({
-                    params: searchParams.toString(),
+                    params: paramsString,
                     key: "topic",
                     value: searchQuery,
                 });
-
                 router.push(newUrl, { scroll: false });
             } else {
-                if(pathname === '/companions') {
+                if (pathname === "/companions") {
                     const newUrl = removeKeysFromUrlQuery({
-                        params: searchParams.toString(),
+                        params: paramsString,
                         keysToRemove: ["topic"],
                     });
-
                     router.push(newUrl, { scroll: false });
                 }
             }
-        }, 500)
-    }, [searchQuery, router, searchParams, pathname]);
+        }, 500);
+
+        return () => clearTimeout(handler);
+    }, [searchQuery, router, paramsString, pathname]);
 
     return (
         <div className="relative border border-black rounded-lg items-center flex gap-2 px-2 py-1 h-fit overflow-hidden">
@@ -46,5 +47,5 @@ export default function SearchInput ()  {
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
         </div>
-    )
+    );
 }
