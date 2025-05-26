@@ -1,60 +1,60 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {subjectsColors, voices} from "@/constants";
+import {subjectsColors} from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+    return twMerge(clsx(inputs))
 }
 
 export const getSubjectColor = (subject: string) => {
-  return subjectsColors[subject as keyof typeof subjectsColors];
+    return subjectsColors[subject as keyof typeof subjectsColors];
 };
 
 export const configureAssistant = (voice: string, style: string) => {
-  const voiceId = voices[voice as keyof typeof voices][
-      style as keyof (typeof voices)[keyof typeof voices]
-      ] || "sarah";
+    // const voiceId = voices[voice as keyof typeof voices][
+    //     style as keyof (typeof voices)[keyof typeof voices]
+    //     ] || "sarah";
 
-  const vapiAssistant = {
-    name: "Companion",
-    firstMessage:
-        "Hello, let's start the session. Today we'll be talking about {{topic}}.",
-    transcriber: {
-      provider: "deepgram",
-      model: "nova-3",
-      language: "en",
-    },
-    voice: {
-      provider: "11labs",
-      voiceId: voiceId,
-      stability: 0.4,
-      similarityBoost: 0.8,
-      speed: 1,
-      style: 0.5,
-      useSpeakerBoost: true,
-    },
-    model: {
-      provider: "openai",
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: `You are a highly knowledgeable tutor teaching a real-time voice session with a student. Your goal is to teach the student about the topic and subject.
-
-                    Tutor Guidelines:
-                    Stick to the given topic - {{ topic }} and subject - {{ subject }} and teach the student about it.
-                    Keep the conversation flowing smoothly while maintaining control.
-                    From time to time make sure that the student is following you and understands you.
-                    Break down the topic into smaller parts and teach the student one part at a time.
-                    Keep your style of conversation {{ style }}.
-                    Keep your responses short, like in a real voice conversation.
-                    Do not include any special characters in your responses - this is a voice conversation.
-              `,
+    return  {
+        name: "Companion",
+        firstMessage:
+            "Привет, давай начнем обучение",
+        transcriber: {
+            provider: "azure",
+            // model: "chatgpt-4o-latest",
+            language: "ru-RU",
         },
-      ],
-    },
-    clientMessages: [],
-    serverMessages: [],
-  };
-  return vapiAssistant;
+        voice: {
+            provider: "openai",
+            model: "tts-1",
+            voiceId: "nova",
+            // stability: 0.4,
+            // similarityBoost: 0.8,
+            // speed: 1,
+            // style: 0.5,
+            // useSpeakerBoost: true,
+        },
+        model: {
+            provider: "openai",
+            model: "chatgpt-4o-latest",
+            messages: [
+                {
+                    role: "system",
+                    content: `Ты — опытный фронтенд разработчик, уровень - senior, который ведёт голосовой урок в реальном времени со студентом. 
+                        Твоя задача — объяснить тему {{ topic }} по предмету {{ subject }}.
+                        
+                        Правила:
+                        - Придерживайся заданной темы и предмета.
+                        - Разбивай материал на маленькие части.
+                        - Убедись, что ученик понимает тебя.
+                        - Поддерживай стиль общения: {{ style }}.
+                        - Отвечай доступно, как в настоящем разговоре.
+                        - Не используй спецсимволов — это голосовой чат.`,
+                },
+            ],
+        },
+        clientMessages: [],
+        serverMessages: [],
+    };
+    // return vapiAssistant;
 };
